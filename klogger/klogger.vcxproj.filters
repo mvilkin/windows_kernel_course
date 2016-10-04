@@ -14,12 +14,18 @@
     <ClCompile Include="ring_buffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ring_buffer_test.c">
+    <ClCompile Include="klogger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klogger_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ring_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
