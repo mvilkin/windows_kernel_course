@@ -9,10 +9,13 @@
 int main()
 {
 	{
-		const char* test_string = "test string";
+		char* test_string = "test string\n";
 		void* log = klog_create("tst.log");
 		size_t written = klog_write(log, test_string, strlen(test_string));
 		assert(written == strlen(test_string));
+		written = klog_write(log, test_string, strlen(test_string));
+		assert(written == strlen(test_string));
+		int_flush(log);
 		klog_destroy(log);
 	}
 

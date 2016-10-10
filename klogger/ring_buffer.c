@@ -4,7 +4,7 @@
 #include "ring_buffer.h"
 #include "utils.h"
 
-rb_t rb_create(const char* filename, size_t size)
+rb_t rb_create(size_t size)
 {
 	ring_buffer_t* rb;
 

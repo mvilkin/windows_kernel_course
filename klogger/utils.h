@@ -6,6 +6,8 @@
 
 void* open_file(const char* name);
 void close_file(void* handle);
+size_t write_file(void* handle, void* src, size_t size);
+
 void* alloc_memory(size_t size);
 void free_memory(void* ptr);
 void copy_memory(void* dst, void* src, size_t size);

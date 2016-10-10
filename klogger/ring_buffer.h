@@ -3,17 +3,15 @@
 
 typedef unsigned char uint8_t;
 
-struct _ring_buffer_t
+typedef struct _ring_buffer_t
 {
 	uint8_t* buffer;
 	uint8_t* head;
 	uint8_t* tail;
 	size_t   size;
-};
-typedef struct _ring_buffer_t ring_buffer_t;
-typedef struct _ring_buffer_t *rb_t;
+} ring_buffer_t, *rb_t;
 
-rb_t rb_create(const char* filename, size_t size);
+rb_t rb_create(size_t size);
 void rb_destroy(rb_t rb);
 size_t rb_write(rb_t rb, void* src, size_t size);
 size_t rb_read(rb_t rb, void* dst, size_t size);
