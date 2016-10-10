@@ -1,6 +1,9 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
+#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+
 void* open_file(const char* name);
 void close_file(void* handle);
 void* alloc_memory(size_t size);
