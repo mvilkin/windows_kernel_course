@@ -28,3 +28,8 @@ void free_memory(void* ptr)
 {
 	free(ptr);
 }
+
+void copy_memory(void* dst, void* src, size_t size)
+{
+	memcpy(dst, src, size);
+}
