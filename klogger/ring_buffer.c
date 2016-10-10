@@ -2,17 +2,25 @@
 #include <stdlib.h>
 
 #include "ring_buffer.h"
-
-static char* buffer;
+#include "utils.h"
 
 rb_t rb_create(const char* filename, size_t size)
 {
-	return NULL;
+	ring_buffer_t* rb;
+
+	rb = alloc_memory(sizeof(ring_buffer_t));
+	rb->size = size;
+	rb->buffer = alloc_memory(size);
+	rb->head = rb->buffer;
+	rb->tail = rb->buffer;
+
+	return rb;
 }
 
 void rb_destroy(rb_t rb)
 {
-	
+	free_memory(rb->buffer);
+	free_memory(rb);
 }
 
 size_t rb_write(rb_t rb, const void* src, size_t size)
