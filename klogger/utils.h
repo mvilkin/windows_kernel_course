@@ -12,4 +12,6 @@ void* alloc_memory(size_t size);
 void free_memory(void* ptr);
 void copy_memory(void* dst, void* src, size_t size);
 
+long atomic_add(long* shared, long value);
+
 #endif // _UTILS_H_

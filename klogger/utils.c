@@ -56,3 +56,8 @@ void copy_memory(void* dst, void* src, size_t size)
 		return;
 	memcpy(dst, src, size);
 }
+
+long atomic_add(long* shared, long value)
+{
+	return InterlockedExchangeAdd(shared, value);
+}

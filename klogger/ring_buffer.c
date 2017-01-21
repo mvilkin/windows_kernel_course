@@ -1,18 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 
 #include "ring_buffer.h"
 #include "utils.h"
 
-rb_t rb_create(size_t size)
+rb_t rb_create(size_t size, rb_overflow_callback_t cb)
 {
 	ring_buffer_t* rb;
 
 	rb = alloc_memory(sizeof(ring_buffer_t));
 	rb->size = size;
 	rb->buffer = alloc_memory(size);
-	rb->head = rb->buffer;
-	rb->tail = rb->buffer;
+	rb->ofw_callback = cb;
+	rb->uHead = 0;
+	rb->uTail = 0;
+	rb->uWritten = 0;
 
 	return rb;
 }
@@ -25,49 +28,61 @@ void rb_destroy(rb_t rb)
 
 size_t rb_write(rb_t rb, void* src, size_t size)
 {
-	if (rb->buffer + rb->size >= rb->tail + size)
-	{
-		copy_memory(rb->tail, src, size);
-		rb->tail += size;
+	uint32_t oldTail;
+
+	/*
+	TODO: Writing overflow message
+	*/
+	if (rb->uTail - rb->uHead + size >= rb->size){
+		//overflowing
+		return 0;
 	}
-	else
-	{
-		size_t bottom_size = rb->size - (rb->tail - rb->buffer);
-		copy_memory(rb->tail, src, bottom_size);
-		copy_memory(rb->buffer, (uint8_t*)src + bottom_size, size - bottom_size);
-		rb->tail = rb->buffer + size - bottom_size;
+	oldTail = atomic_add(rb->uTail, size);
+	if (oldTail - rb->uHead + size >= rb->size){
+		//overflowing
+		//dec tail
+		rb->uTail -= size;
+		return 0;
 	}
+
+	if (rb->size - (oldTail % rb->size) < size){
+		//overlapping
+		size_t partSize = rb->size - (oldTail % rb->size);
+		copy_memory(&rb->buffer[oldTail % rb->size], src, partSize);
+		copy_memory(&rb->buffer[0
+		], (uint8_t*)src + partSize, size - partSize);
+	}
+	else {
+		copy_memory(&rb->buffer[oldTail % rb->size], src, size);
+	}
+
+	// sync with read thread
+	// busywait for logs before this
+	while (rb->uWritten != oldTail)
+		;
+	rb->uWritten += size;
+
 	return size;
 }
 
 size_t rb_read(rb_t rb, void* dst, size_t size)
 {
-	size_t read_size = 0;
+	uint32_t oldWritten;
 
-	if (rb->head <= rb->tail)
-	{
-		read_size = MIN(rb->tail - rb->head, size);
-		copy_memory(dst, rb->head, read_size);
-		rb->head += read_size;
-	}
-	else
-	{
-		size_t bottom_size = rb->size - (rb->head - rb->buffer);
-		size_t top_size = 0;
-		if (size > bottom_size)
-		{
-			top_size = MIN(rb->size - bottom_size, size - bottom_size);
-			read_size = bottom_size + top_size;
-		}
-		else
-		{
-			bottom_size = MIN(size, bottom_size);
-			read_size = bottom_size;
-		}
-		copy_memory(dst, rb->head, bottom_size);
-		copy_memory((uint8_t*)dst + bottom_size, rb->buffer, top_size);
-		rb->head = rb->buffer + top_size;
-	}
+	if (rb->uTail == rb->uHead)
+		return 0;
+	oldWritten = rb->uWritten;
+	size = oldWritten - rb->uHead;
 
-	return read_size;
+	if (rb->size - (rb->uHead % rb->size) < size){
+		//overlapping
+		size_t partSize = rb->size - (rb->uHead % rb->size);
+		copy_memory(dst, &rb->buffer[rb->uHead % rb->size], partSize);
+		copy_memory((uint8_t*)dst + partSize, &rb->buffer[0], size - partSize);
+	}
+	else {
+		copy_memory(dst, &rb->buffer[rb->uHead % rb->size], size);
+	}
+	rb->uHead += oldWritten;
+	return size;
 }
