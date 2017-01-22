@@ -28,7 +28,7 @@ HANDLE open_file(const char* name)
 		NULL, 0);
 
 	if (!NT_SUCCESS(status)) {
-		DbgPrint("KLogger: open/create file error\n");
+		DbgPrint("KLogger: open/create file error 0x%x\n", status);
 		return NULL;
 	}
 

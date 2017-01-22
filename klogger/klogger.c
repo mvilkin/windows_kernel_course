@@ -71,7 +71,7 @@ void klog_destroy(void* log)
 	if (klog->stop_working)
 		return;
 
-	prev_stop = atomic_set(klog->stop_working, TRUE);
+	prev_stop = atomic_set(&klog->stop_working, TRUE);
 	if (prev_stop)
 		return;
 
@@ -86,6 +86,7 @@ void klog_destroy(void* log)
 size_t klog_write(void* log, void* buffer, size_t size)
 {
 	klog_t klog = (klog_t)log;
+	DbgPrint("Write %db\n", size);
 
 	if (!klog || !buffer || !size)
 		return 0;

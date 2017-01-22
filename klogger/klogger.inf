@@ -7,7 +7,7 @@ Signature="$WINDOWS NT$"
 Class=
 ClassGuid=
 Provider=
-DriverVer=
+DriverVer=01/20/2017
 CatalogFile=KloggerCatalogFile.cat
 
 [DestinationDirs]
@@ -21,12 +21,12 @@ DefaultDestDir = 12
 
 
 [Manufacturer]
-%ManufacturerName%=Standard,NT$ARCH$
+%ManufacturerName%=Standard,NTAMD64
 
-[Standard.NT$ARCH$]
+[Standard.NTAMD64]
 
 
 [Strings]
-ManufacturerName=""
+ManufacturerName="MIH"
 ClassName=""
 DiskName="klogger Source Disk"

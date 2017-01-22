@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "klogger", "klogger.vcxproj", "{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}"
 EndProject
@@ -43,7 +43,6 @@ Global
 		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Debug|Win32.Deploy.0 = Win8 Debug|Win32
 		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Debug|x64.ActiveCfg = Win8 Debug|x64
 		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Debug|x64.Build.0 = Win8 Debug|x64
-		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Debug|x64.Deploy.0 = Win8 Debug|x64
 		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Release|Win32.ActiveCfg = Win8 Release|Win32
 		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Release|Win32.Build.0 = Win8 Release|Win32
 		{D8EE0E7F-A3F9-40B9-98C6-7FB3BEEF0244}.Win8 Release|Win32.Deploy.0 = Win8 Release|Win32
@@ -79,7 +78,6 @@ Global
 		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Debug|Win32.Deploy.0 = Win8 Debug|Win32
 		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Debug|x64.ActiveCfg = Win8 Debug|x64
 		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Debug|x64.Build.0 = Win8 Debug|x64
-		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Debug|x64.Deploy.0 = Win8 Debug|x64
 		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Release|Win32.ActiveCfg = Win8 Release|Win32
 		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Release|Win32.Build.0 = Win8 Release|Win32
 		{E6F79A1B-1B91-4439-BB2E-67005F0F3579}.Win8 Release|Win32.Deploy.0 = Win8 Release|Win32

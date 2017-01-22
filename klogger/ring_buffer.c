@@ -36,7 +36,7 @@ size_t rb_write(rb_t rb, void* src, size_t size)
 		//overflowing
 		return 0;
 	}
-	oldTail = atomic_add(rb->uTail, size);
+	oldTail = atomic_add(&rb->uTail, size);
 	if (oldTail - rb->uHead + size >= rb->size){
 		//overflowing
 		//dec tail
@@ -82,6 +82,6 @@ size_t rb_read(rb_t rb, void* dst, size_t size)
 	else {
 		copy_memory(dst, &rb->buffer[rb->uHead % rb->size], size);
 	}
-	rb->uHead += oldWritten;
+	rb->uHead = oldWritten;
 	return size;
 }

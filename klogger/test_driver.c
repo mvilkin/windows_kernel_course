@@ -21,7 +21,7 @@ NTSTATUS DriverEntry(
 
 	DriverObject->DriverUnload = KloggerTestUnload;
 
-	klog = klog_create("\\DosDevices\\C:\\Data\\KloggerTest.log");
+	klog = klog_create(L"\\??\\C:\\Data\\KloggerTest.log");
 	if (!klog) {
 		DbgPrint("KLogger: Driver Enrty - error creating klogger\n");
 		return STATUS_FAILED_DRIVER_ENTRY;
