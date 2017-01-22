@@ -4,7 +4,7 @@
 #include "ring_buffer.h"
 #include "utils.h"
 
-rb_t rb_create(size_t size, rb_overflow_callback_t cb)
+rb_t rb_create(size_t size, rb_overflow_callback_t cb, void* context)
 {
 	ring_buffer_t* rb;
 
@@ -12,6 +12,7 @@ rb_t rb_create(size_t size, rb_overflow_callback_t cb)
 	rb->size = size;
 	rb->buffer = alloc_memory(size);
 	rb->ofw_callback = cb;
+	rb->callback_context = context;
 	rb->uHead = 0;
 	rb->uTail = 0;
 	rb->uWritten = 0;
@@ -63,7 +64,7 @@ size_t rb_write(rb_t rb, const void* src, size_t size)
 	if (oldTail - rb->uHead < rb->size / 2 &&
 		oldTail - rb->uHead + size >= rb->size / 2 &&
 		rb->ofw_callback)
-		rb->ofw_callback(rb);
+		rb->ofw_callback(rb->callback_context);
 
 	rb->uWritten += size;
 

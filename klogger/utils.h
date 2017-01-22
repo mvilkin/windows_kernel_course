@@ -3,9 +3,6 @@
 
 #include <ntddk.h>
 
-#define container_of(ptr, type, member) \
-	((type *)((char *)(ptr)-(unsigned long)(&((type *)0)->member)))
-
 HANDLE open_file(const char* name);
 NTSTATUS close_file(void* handle);
 size_t write_file(void* handle, void* src, size_t size);

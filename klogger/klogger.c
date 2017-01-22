@@ -8,7 +8,7 @@ static const size_t LOGGER_SIZE = 1 << 12; // 4 KB
 static const size_t LOGGER_FLUSH_SIZE = 1 << 11; // 2 KB
 
 void init_events(klog_t klog);
-void event_callback();
+void event_callback(void* context);
 void destroy_events(klog_t klog);
 void perform_flush(klog_t klog);
 VOID flush_routine(PVOID context);
@@ -23,7 +23,7 @@ void* klog_create(const char* filename)
 		return NULL;
 	}
 
-	klog->rb = rb_create(LOGGER_SIZE, event_callback);
+	klog->rb = rb_create(LOGGER_SIZE, event_callback, klog);
 	if (!klog->rb) {
 		DbgPrint("KLogger: init error - create ring buffer\n");
 		goto err_rbcreate;
@@ -108,15 +108,15 @@ void init_events(klog_t klog)
 	KeInitializeEvent(&klog->event_flush, NotificationEvent, FALSE);
 }
 
-void event_callback(void* _rb)
+void event_callback(void* context)
 {
 	klog_t klog;
 
-	if (!_rb)
+	if (!context)
 		return;
 
 	DbgPrint("KLogger: callback handled\n");
-	klog = container_of(_rb, klogger_info_t, rb);
+	klog = (klog_t)context;
 	KeSetEvent(&klog->event_flush, 0, FALSE);
 }
 
