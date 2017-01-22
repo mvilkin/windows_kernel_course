@@ -29,7 +29,7 @@ NTSTATUS DriverEntry(
 
 	start_klogger_test();
 
-	DbgPrint("KLogger: Driver Enrty - test finished\n");
+	DbgPrint("KLogger: DriverEntry completed\n");
 	return STATUS_SUCCESS;
 }
 
@@ -37,8 +37,8 @@ VOID KloggerTestUnload(
 	IN PDRIVER_OBJECT DriverObject)
 {
 	DbgPrint("KLogger: start DriverUnload\n");
-
 	klog_destroy(klog);
+	DbgPrint("KLogger: DriverUnload completed\n");
 }
 
 void start_klogger_test()
@@ -65,7 +65,7 @@ void start_klogger_test()
 	KeInitializeTimer(timer_test);
 	KeInitializeDpc(timer_dpc_obj, timer_dpc_test_routine, klog);
 
-	timeout.QuadPart = -10000000LL;	// 1 sec, because time in 100ns format
+	timeout.QuadPart = -1000000LL;	// 100ms, because time in 100ns format
 	period = 5000; // 5s, because time in 1ms format
 	KeSetTimerEx(timer_test, timeout, period, timer_dpc_obj);
 
@@ -108,7 +108,7 @@ VOID timer_dpc_test_routine(
 
 		KeRaiseIrql(HIGH_LEVEL, &cur_irql);
 		ret_size = klog_write(klog, msg, msg_size);
-		DbgPrint("KLogger: test write high - %zu out of %zu\n", ret_size, msg_size);
+		DbgPrint("KLogger: test write high - 0x%x out of 0x%x\n", ret_size, msg_size);
 		KeLowerIrql(cur_irql);
 	}
 	else {
@@ -117,7 +117,7 @@ VOID timer_dpc_test_routine(
 		size_t ret_size;
 
 		ret_size = klog_write(klog, msg, msg_size);
-		DbgPrint("KLogger: test write dpc - %zu out of %zu\n", ret_size, msg_size);
+		DbgPrint("KLogger: test write dpc - 0x%x out of 0x%x\n", ret_size, msg_size);
 	}
 
 	counter++;

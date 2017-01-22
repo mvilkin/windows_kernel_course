@@ -86,7 +86,7 @@ void klog_destroy(void* log)
 size_t klog_write(void* log, void* buffer, size_t size)
 {
 	klog_t klog = (klog_t)log;
-	DbgPrint("Write %db\n", size);
+	DbgPrint("KLogger: write log message - 0x%x\n", size);
 
 	if (!klog || !buffer || !size)
 		return 0;
@@ -130,7 +130,7 @@ VOID flush_routine(PVOID context)
 	PVOID handles[1];
 	LARGE_INTEGER timeout;
 
-	DbgPrint("KLogger: flust thread - enter\n");
+	DbgPrint("KLogger: flust thread - enter routine\n");
 
 	handles[0] = (PVOID)&klog->event_flush;
 	timeout.QuadPart = -10000000LL; // 1 sec, because time in 100ns format
@@ -152,7 +152,7 @@ VOID flush_routine(PVOID context)
 		perform_flush(klog);
 	}
 
-	DbgPrint("KLogger: flust thread - exit");
+	DbgPrint("KLogger: flust thread - exit routine");
 
 	PsTerminateSystemThread(STATUS_SUCCESS);
 }

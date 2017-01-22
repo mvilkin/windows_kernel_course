@@ -10,6 +10,8 @@ HANDLE open_file(const char* name)
 	NTSTATUS status;
 	IO_STATUS_BLOCK status_block;
 
+	DbgPrint("KLogger: utils - open file\n");
+
 	if (!name)
 		return NULL;
 
@@ -38,6 +40,8 @@ HANDLE open_file(const char* name)
 
 NTSTATUS close_file(void* handle)
 {
+	DbgPrint("KLogger: utils - close file\n");
+
 	if (!handle)
 		return STATUS_SUCCESS;
 	return ZwClose(handle);
@@ -47,6 +51,8 @@ size_t write_file(void* handle, void* src, size_t size)
 {
 	NTSTATUS status;
 	IO_STATUS_BLOCK status_block;
+
+	DbgPrint("KLogger: utils - write file\n");
 
 	if (!handle || !src || !size)
 		return 0;
@@ -68,6 +74,7 @@ void* alloc_memory(size_t size)
 	if (!size)
 		return NULL;
 
+	DbgPrint("KLogger: alloc - allocate memoty\n");
 	return ExAllocatePoolWithTag(NonPagedPool, size, 'Tag1');
 }
 
@@ -76,6 +83,7 @@ void free_memory(void* ptr)
 	if (!ptr)
 		return;
 
+	DbgPrint("KLogger: alloc - free memoty\n");
 	ExFreePoolWithTag(ptr, 'Tag1');
 }
 
@@ -84,15 +92,18 @@ void copy_memory(void* dst, void* src, size_t size)
 	if (!dst || !src || !size)
 		return;
 
+	DbgPrint("KLogger: alloc - copy memoty\n");
 	RtlCopyMemory(dst, src, size);
 }
 
 long atomic_add(long* shared, long value)
 {
+	DbgPrint("KLogger: atomic - add\n");
 	return InterlockedExchangeAdd(shared, value);
 }
 
 long atomic_set(long* shared, long value)
 {
+	DbgPrint("KLogger: atomic - set\n");
 	return InterlockedExchange(shared, value);
 }
