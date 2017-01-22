@@ -2,9 +2,11 @@
 #include "klogger.h"
 #include"utils.h"
 
+#define TEST_TIMERS_NUMBER 5
+
 static void* klog = NULL;
-static PKTIMER timer_test = NULL;
-static PRKDPC timer_dpc_obj = NULL;
+static PKTIMER timer_test[TEST_TIMERS_NUMBER];
+static PRKDPC dpc_obj[TEST_TIMERS_NUMBER];
 
 VOID KloggerTestUnload(PDRIVER_OBJECT DriverObject);
 void start_klogger_test();
@@ -37,7 +39,6 @@ VOID KloggerTestUnload(
 	IN PDRIVER_OBJECT DriverObject)
 {
 	DbgPrint("KLogger: start DriverUnload\n");
-	stop_klogger_test();
 	klog_destroy(klog);
 	DbgPrint("KLogger: DriverUnload completed\n");
 }
@@ -49,26 +50,42 @@ void start_klogger_test()
 
 	DbgPrint("KLogger: start test\n");
 
-	timer_test = alloc_memory(sizeof(KTIMER));
-	if (!timer_test) {
-		DbgPrint("KLogger: start test - error allocate memory for test timer\n");
-		return;
+	for (unsigned i = 0; i < TEST_TIMERS_NUMBER; i++) {
+		timer_test[i] = alloc_memory(sizeof(KTIMER));
+		if (!timer_test[i]) {
+			for (unsigned j = 0; j < i; j++) {
+				free_memory(timer_test[j]);
+				timer_test[j] = NULL;
+			}
+			DbgPrint("KLogger: start test - error allocate memory for test timer\n");
+			return;
+		}
 	}
 
-	timer_dpc_obj = alloc_memory(sizeof(KDPC));
-	if (!timer_dpc_obj) {
-		free_memory(timer_test);
-		timer_test = NULL;
-		DbgPrint("KLogger: start test - error allocate memory for dpc object\n");
-		return;
+	for (unsigned i = 0; i < TEST_TIMERS_NUMBER; i++) {
+		dpc_obj[i] = alloc_memory(sizeof(KDPC));
+		if (!dpc_obj[i]) {
+			for (unsigned j = 0; j < i; j++) {
+				free_memory(dpc_obj[j]);
+				dpc_obj[j] = NULL;
+			}
+			for (unsigned j = 0; j < TEST_TIMERS_NUMBER; j++) {
+				free_memory(timer_test[j]);
+				timer_test[j] = NULL;
+			}
+			DbgPrint("KLogger: start test - error allocate memory for dpc object\n");
+			return;
+		}
 	}
-
-	KeInitializeTimer(timer_test);
-	KeInitializeDpc(timer_dpc_obj, timer_dpc_test_routine, klog);
 
 	timeout.QuadPart = -1000000LL;	// 100ms, because time in 100ns format
-	period = 5000; // 5s, because time in 1ms format
-	KeSetTimerEx(timer_test, timeout, period, timer_dpc_obj);
+	period = 1000; // 1s, because time in 1ms format
+
+	for (unsigned i = 0; i < TEST_TIMERS_NUMBER; i++) {
+		KeInitializeTimer(timer_test[i]);
+		KeInitializeDpc(dpc_obj[i], timer_dpc_test_routine, klog);
+		KeSetTimerEx(timer_test[i], timeout, period, dpc_obj[i]);
+	}
 
 	DbgPrint("KLogger: start test completed\n");
 
@@ -79,15 +96,18 @@ void stop_klogger_test()
 {
 	DbgPrint("KLogger: stop test\n");
 
-	if (!timer_dpc_obj || !timer_test) {
+	if (!dpc_obj[0] || !timer_test[0]) {
 		DbgPrint("KLogger: start was failed\n");
 		return;
 	}
 
 	KeFlushQueuedDpcs();
-	KeCancelTimer(timer_test);
-	free_memory(timer_test);
-	free_memory(timer_dpc_obj);
+
+	for (unsigned i = 0; i < TEST_TIMERS_NUMBER; i++) {
+		KeCancelTimer(timer_test[i]);
+		free_memory(timer_test[i]);
+		free_memory(dpc_obj[i]);
+	}
 
 	DbgPrint("KLogger: stop test complete\n");
 }
