@@ -8,7 +8,7 @@ void* klog_create(const char* filename)
 {
 	klog_t klog = alloc_memory(sizeof(klogger_info_t));
 	klog->file_handle = open_file(filename);
-	klog->rb = rb_create(LOGGER_SIZE);
+	klog->rb = rb_create(LOGGER_SIZE, NULL);
 	klog->filled_size = 0;
 	return (void*)klog;
 }
