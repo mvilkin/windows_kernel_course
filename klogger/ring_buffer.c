@@ -25,7 +25,7 @@ void rb_destroy(rb_t rb)
 	free_memory(rb);
 }
 
-size_t rb_write(rb_t rb, void* src, size_t size)
+size_t rb_write(rb_t rb, const void* src, size_t size)
 {
 	uint32_t oldTail;
 
@@ -59,6 +59,12 @@ size_t rb_write(rb_t rb, void* src, size_t size)
 	// busywait for logs before this
 	while (rb->uWritten != oldTail)
 		;
+
+	if (oldTail - rb->uHead < rb->size / 2 &&
+		oldTail - rb->uHead + size >= rb->size / 2 &&
+		rb->ofw_callback)
+		rb->ofw_callback(rb);
+
 	rb->uWritten += size;
 
 	return size;

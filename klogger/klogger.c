@@ -2,10 +2,13 @@
 #include "ring_buffer.h"
 #include "utils.h"
 
-static const size_t LOGGER_SIZE = 1 << 22; // 4 MB
-static const size_t LOGGER_FLUSH_SIZE = 1 << 21; // 2 MB
+//static const size_t LOGGER_SIZE = 1 << 22; // 4 MB
+//static const size_t LOGGER_FLUSH_SIZE = 1 << 21; // 2 MB
+static const size_t LOGGER_SIZE = 1 << 12; // 4 KB
+static const size_t LOGGER_FLUSH_SIZE = 1 << 11; // 2 KB
 
 void init_events(klog_t klog);
+void event_callback();
 void destroy_events(klog_t klog);
 void perform_flush(klog_t klog);
 VOID flush_routine(PVOID context);
@@ -20,7 +23,7 @@ void* klog_create(const char* filename)
 		return NULL;
 	}
 
-	klog->rb = rb_create(LOGGER_SIZE, NULL);
+	klog->rb = rb_create(LOGGER_SIZE, event_callback);
 	if (!klog->rb) {
 		DbgPrint("KLogger: init error - create ring buffer\n");
 		goto err_rbcreate;
@@ -83,7 +86,7 @@ void klog_destroy(void* log)
 	free_memory(klog);
 }
 
-size_t klog_write(void* log, void* buffer, size_t size)
+size_t klog_write(void* log, const void* buffer, size_t size)
 {
 	klog_t klog = (klog_t)log;
 	DbgPrint("KLogger: write log message - 0x%x\n", size);
@@ -102,10 +105,19 @@ void init_events(klog_t klog)
 	if (!klog)
 		return;
 
-	KeInitializeEvent(
-		&klog->event_flush,
-		SynchronizationEvent, // TODO: NotificationEvent
-		FALSE);
+	KeInitializeEvent(&klog->event_flush, NotificationEvent, FALSE);
+}
+
+void event_callback(void* _rb)
+{
+	klog_t klog;
+
+	if (!_rb)
+		return;
+
+	DbgPrint("KLogger: callback handled\n");
+	klog = container_of(_rb, klogger_info_t, rb);
+	KeSetEvent(&klog->event_flush, 0, FALSE);
 }
 
 void destroy_events(klog_t klog)
@@ -133,7 +145,7 @@ VOID flush_routine(PVOID context)
 	DbgPrint("KLogger: flust thread - enter routine\n");
 
 	handles[0] = (PVOID)&klog->event_flush;
-	timeout.QuadPart = -10000000LL; // 1 sec, because time in 100ns format
+	timeout.QuadPart = -1000000000LL; // 100 sec, because time in 100ns format
 
 	while (!klog->stop_working) {
 		NTSTATUS status = KeWaitForMultipleObjects(
@@ -150,9 +162,11 @@ VOID flush_routine(PVOID context)
 			DbgPrint("KLogger: flust thread - timer event\n");
 
 		perform_flush(klog);
+
+		KeClearEvent(&klog->event_flush);
 	}
 
-	DbgPrint("KLogger: flust thread - exit routine");
+	DbgPrint("KLogger: flust thread - exit routine\n");
 
 	PsTerminateSystemThread(STATUS_SUCCESS);
 }

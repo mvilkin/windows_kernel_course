@@ -87,7 +87,7 @@ void free_memory(void* ptr)
 	ExFreePoolWithTag(ptr, 'Tag1');
 }
 
-void copy_memory(void* dst, void* src, size_t size)
+void copy_memory(void* dst, const void* src, size_t size)
 {
 	if (!dst || !src || !size)
 		return;

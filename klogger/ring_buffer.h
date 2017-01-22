@@ -6,7 +6,7 @@ typedef unsigned int uint32_t;
 
 struct _ring_buffer_t;
 
-typedef (*rb_overflow_callback_t)(struct _ring_buffer_t rb, size_t size);
+typedef (*rb_overflow_callback_t)(struct _ring_buffer_t* rb);
 
 typedef struct _ring_buffer_t
 {
@@ -20,7 +20,7 @@ typedef struct _ring_buffer_t
 
 rb_t rb_create(size_t size, rb_overflow_callback_t cb);
 void rb_destroy(rb_t rb);
-size_t rb_write(rb_t rb, void* src, size_t size);
+size_t rb_write(rb_t rb, const void* src, size_t size);
 size_t rb_read(rb_t rb, void* dst, size_t size);
 
 #endif // _RING_BUFFER_H_

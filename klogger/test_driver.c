@@ -39,6 +39,7 @@ VOID KloggerTestUnload(
 	IN PDRIVER_OBJECT DriverObject)
 {
 	DbgPrint("KLogger: start DriverUnload\n");
+	stop_klogger_test();
 	klog_destroy(klog);
 	DbgPrint("KLogger: DriverUnload completed\n");
 }
@@ -88,8 +89,7 @@ void start_klogger_test()
 	}
 
 	DbgPrint("KLogger: start test completed\n");
-
-	return 0;
+	return;
 }
 
 void stop_klogger_test()
