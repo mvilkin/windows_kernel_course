@@ -74,8 +74,8 @@ void* alloc_memory(size_t size)
 	if (!size)
 		return NULL;
 
-	DbgPrint("KLogger: alloc - allocate memoty\n");
-	return ExAllocatePoolWithTag(NonPagedPool, size, 'Tag1');
+	DbgPrint("KLogger: memory - allocate memoty\n");
+	return ExAllocatePoolWithTag(NonPagedPool, size, 'tag0');
 }
 
 void free_memory(void* ptr)
@@ -83,8 +83,8 @@ void free_memory(void* ptr)
 	if (!ptr)
 		return;
 
-	DbgPrint("KLogger: alloc - free memoty\n");
-	ExFreePoolWithTag(ptr, 'Tag1');
+	DbgPrint("KLogger: memory - free memoty\n");
+	ExFreePoolWithTag(ptr, 'tag0');
 }
 
 void copy_memory(void* dst, const void* src, size_t size)
@@ -92,7 +92,7 @@ void copy_memory(void* dst, const void* src, size_t size)
 	if (!dst || !src || !size)
 		return;
 
-	DbgPrint("KLogger: alloc - copy memoty\n");
+	DbgPrint("KLogger: memory - copy memoty\n");
 	RtlCopyMemory(dst, src, size);
 }
 

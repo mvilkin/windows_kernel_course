@@ -2,7 +2,7 @@
 #include "klogger.h"
 #include"utils.h"
 
-#define TEST_TIMERS_NUMBER 5
+#define TEST_TIMERS_NUMBER 1
 
 static void* klog = NULL;
 static PKTIMER timer_test[TEST_TIMERS_NUMBER];

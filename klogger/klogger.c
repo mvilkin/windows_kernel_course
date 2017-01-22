@@ -145,7 +145,7 @@ VOID flush_routine(PVOID context)
 	DbgPrint("KLogger: flust thread - enter routine\n");
 
 	handles[0] = (PVOID)&klog->event_flush;
-	timeout.QuadPart = -1000000000LL; // 100 sec, because time in 100ns format
+	timeout.QuadPart = -100000000LL; // 10 sec, because time in 100ns format
 
 	while (!klog->stop_working) {
 		NTSTATUS status = KeWaitForMultipleObjects(
