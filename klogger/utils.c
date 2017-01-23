@@ -20,14 +20,10 @@ HANDLE open_file(const char* name)
 	InitializeObjectAttributes(&attribs, &name_unicode,
 		OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
 
-	status = ZwCreateFile(&hfile,
-		GENERIC_WRITE,
-		&attribs, &status_block, NULL,
-		FILE_ATTRIBUTE_NORMAL,
-		FILE_SHARE_READ,
-		FILE_OVERWRITE_IF,
-		FILE_SYNCHRONOUS_IO_NONALERT,
-		NULL, 0);
+	status = ZwCreateFile(&hfile, GENERIC_WRITE, &attribs,
+		&status_block, NULL, FILE_ATTRIBUTE_NORMAL,
+		FILE_SHARE_READ, FILE_OVERWRITE_IF,
+		FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
 
 	if (!NT_SUCCESS(status)) {
 		DbgPrint("KLogger: open/create file error 0x%x\n", status);
@@ -75,7 +71,7 @@ void* alloc_memory(size_t size)
 		return NULL;
 
 	DbgPrint("KLogger: memory - allocate memoty\n");
-	return ExAllocatePoolWithTag(NonPagedPool, size, 'tag0');
+	return ExAllocatePoolWithTag(NonPagedPool, size, 'Tag1');
 }
 
 void free_memory(void* ptr)
@@ -84,7 +80,7 @@ void free_memory(void* ptr)
 		return;
 
 	DbgPrint("KLogger: memory - free memoty\n");
-	ExFreePoolWithTag(ptr, 'tag0');
+	ExFreePoolWithTag(ptr, 'Tag1');
 }
 
 void copy_memory(void* dst, const void* src, size_t size)

@@ -2,10 +2,8 @@
 #include "ring_buffer.h"
 #include "utils.h"
 
-//static const size_t LOGGER_SIZE = 1 << 22; // 4 MB
-//static const size_t LOGGER_FLUSH_SIZE = 1 << 21; // 2 MB
-static const size_t LOGGER_SIZE = 1 << 12; // 4 KB
-static const size_t LOGGER_FLUSH_SIZE = 1 << 11; // 2 KB
+static const size_t LOGGER_SIZE = 1 << 22; // 4 MB
+static const size_t LOGGER_FLUSH_SIZE = 1 << 21; // 2 MB
 
 void init_events(klog_t klog);
 void event_callback(void* context);
@@ -51,6 +49,8 @@ void* klog_create(const char* filename)
 		goto err_thrcreate;
 	}
 
+	DbgPrint("KLogger: init completed\n");
+
 	return (void*)klog;
 
 err_thrcreate:
@@ -84,6 +84,8 @@ void klog_destroy(void* log)
 	rb_destroy(klog->rb);
 	free_memory(klog->buffer_flush);
 	free_memory(klog);
+
+	DbgPrint("KLogger: destroy completed\n");
 }
 
 size_t klog_write(void* log, const void* buffer, size_t size)
@@ -148,15 +150,8 @@ VOID flush_routine(PVOID context)
 	timeout.QuadPart = -100000000LL; // 10 sec, because time in 100ns format
 
 	while (!klog->stop_working) {
-		NTSTATUS status = KeWaitForMultipleObjects(
-			1,
-			handles,
-			WaitAny,
-			Executive,
-			KernelMode,
-			TRUE,
-			&timeout,
-			NULL);
+		NTSTATUS status = KeWaitForMultipleObjects(1, handles, WaitAny,
+			Executive, KernelMode, TRUE, &timeout, NULL);
 
 		if (status == STATUS_TIMEOUT)
 			DbgPrint("KLogger: flust thread - timer event\n");
@@ -179,39 +174,24 @@ void init_thread_flush(klog_t klog)
 	if (!klog)
 		return;
 
-	status = PsCreateSystemThread(
-		&flushing_thread,
-		THREAD_ALL_ACCESS,
-		NULL,
-		NULL,
-		NULL,
-		flush_routine,
-		(PVOID)klog);
+	status = PsCreateSystemThread(&flushing_thread, THREAD_ALL_ACCESS,
+		NULL, NULL, NULL, flush_routine, (PVOID)klog);
 
 	if (!NT_SUCCESS(status)) {
 		DbgPrint("KLogger: flush thread - error creating\n");
 		return;
 	}
 
-	ObReferenceObjectByHandle(
-		flushing_thread,
-		THREAD_ALL_ACCESS,
-		NULL,
-		KernelMode,
-		(PVOID *)&klog->thread_flush,
-		NULL);
+	ObReferenceObjectByHandle(flushing_thread, THREAD_ALL_ACCESS,
+		NULL, KernelMode, (PVOID *)&klog->thread_flush, NULL);
 
 	ZwClose(flushing_thread);
 }
 
 void destroy_thread_flush(klog_t klog)
 {
-	KeWaitForSingleObject(
-		klog->thread_flush,
-		Executive,
-		KernelMode,
-		FALSE,
-		NULL);
+	KeWaitForSingleObject(klog->thread_flush, Executive,
+		KernelMode, FALSE, NULL);
 
 	ObDereferenceObject(klog->thread_flush);
 

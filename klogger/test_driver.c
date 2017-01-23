@@ -2,7 +2,7 @@
 #include "klogger.h"
 #include"utils.h"
 
-#define TEST_TIMERS_NUMBER 1
+#define TEST_TIMERS_NUMBER 5
 
 static void* klog = NULL;
 static PKTIMER timer_test[TEST_TIMERS_NUMBER];
@@ -129,8 +129,8 @@ VOID timer_dpc_test_routine(
 
 		KeRaiseIrql(HIGH_LEVEL, &cur_irql);
 		ret_size = klog_write(klog, msg, msg_size);
-		DbgPrint("KLogger: test write high - 0x%x out of 0x%x\n", ret_size, msg_size);
 		KeLowerIrql(cur_irql);
+		DbgPrint("KLogger: test write high - 0x%x out of 0x%x\n", ret_size, msg_size);
 	}
 	else {
 		static const char* msg = "message from dpc level\r\n";
